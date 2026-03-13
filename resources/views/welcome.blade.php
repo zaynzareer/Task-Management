@@ -78,9 +78,9 @@
 
                 <div class="flex-1">
                     <img
-                        src="/task-dashboard.png"
+                        src="{{ asset('storage/landing_page_image.png') }}"
                         alt="Task management dashboard"
-                        class="w-full max-w-lg mx-auto"
+                        class="w-40% max-w-lg mx-auto"
                     />
                 </div>
             </div>
