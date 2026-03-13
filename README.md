@@ -14,7 +14,6 @@ This project was developed as part of a technical assessment for an internship a
 - [Environment Variables](#environment-variables)
 - [Setup](#setup)
 - [Running the Application](#running-the-application)
-- [Running Tests](#running-tests)
 - [API Reference](#api-reference)
 - [Design Decisions & Assumptions](#design-decisions--assumptions)
 
