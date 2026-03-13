@@ -87,21 +87,21 @@
 
             <div class="max-w-6xl mx-auto px-6 pb-16">
                 <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-300">
                         <h3 class="text-xl font-semibold text-gray-800">Smart Task Lists</h3>
                         <p class="mt-2 text-gray-600">
                             Organize tasks into projects and lists so nothing gets lost.
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-300">
                         <h3 class="text-xl font-semibold text-gray-800">Progress Tracking</h3>
                         <p class="mt-2 text-gray-600">
                             Monitor your productivity and track completed tasks easily.
                         </p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-300">
                         <h3 class="text-xl font-semibold text-gray-800">Focus Mode</h3>
                         <p class="mt-2 text-gray-600">
                             Stay distraction-free with a clean workspace for your tasks.
