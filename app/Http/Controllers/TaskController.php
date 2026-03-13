@@ -17,11 +17,24 @@ class TaskController extends Controller
         // Check policy: user can view their task list.
         $this->authorize('viewAny', Task::class);
 
-        // Return tasks owned by the logged in user.
+        $request->validate([
+            'status' => 'nullable|in:pending,in_progress,completed',
+            'deleted' => 'nullable|in:only',
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        // Return paginated tasks owned by the logged in user.
         $tasks = Task::query()
             ->where('user_id', $request->user()->id)
+            ->when($request->input('deleted') === 'only', function ($query) {
+                $query->onlyTrashed();
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->string('status'));
+            })
             ->latest()
-            ->get();
+            ->paginate(6)
+            ->withQueryString();
 
         return response()->json($tasks);
     }
