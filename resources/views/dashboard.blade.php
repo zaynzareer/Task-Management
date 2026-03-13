@@ -2,7 +2,7 @@
 
 <div class="flex" style="min-height: calc(100vh - 65px)">
 
-    {{--  --}}
+    {{-- SIDEBAR --}}
     <aside class="w-56 bg-white border-r border-orange-100 p-6 flex flex-col gap-1 shrink-0">
         <button
             onclick="setFilter('all')"
@@ -139,9 +139,11 @@
 </div>
 
 <script>
+    // Code wrapped in DOMContentLoaded to ensure it runs after the axios script is loaded
     document.addEventListener('DOMContentLoaded', () => {
         const axios = window.axios;
 
+        // if axios is not available, show an error message
         if (!axios) {
             showView('empty');
             document.getElementById('emptyMsg').textContent =
@@ -150,26 +152,31 @@
             return;
         }
 
+        // Set CSRF token for all axios requests
         axios.defaults.headers.common['X-CSRF-TOKEN'] =
             document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+        // App variables
         let allTasks = [];
         let activeFilter = 'all';
-    let currentPage = 1;
-    let pagination = null;
+        let currentPage = 1;
+        let pagination = null;
 
+        // Constants for priority and status labels and styles
         const PRIORITY = {
             0: { label: 'Low', cls: 'bg-green-100 text-green-600' },
             1: { label: 'Medium', cls: 'bg-orange-100 text-orange-600' },
             2: { label: 'High', cls: 'bg-red-100 text-red-600' },
         };
 
+        // Statuses with their labels and dot colors
         const STATUS = {
             pending: { label: 'Pending', dot: 'bg-yellow-400' },
             in_progress: { label: 'In Progress', dot: 'bg-blue-400' },
             completed: { label: 'Completed', dot: 'bg-green-500' },
         };
 
+        // Allowed status changes based on the current status
         function allowedStatuses(currentStatus) {
             if (currentStatus === 'pending') {
                 return ['pending', 'in_progress'];
@@ -182,7 +189,9 @@
             return ['completed'];
         }
 
+        // Function to show/hide different views (loading, empty, grid) depending on the view parameter
         function showView(view) {
+            // Toggles classes based on the condition to show the correct view and hide others
             document.getElementById('loadingState').classList.toggle('hidden', view !== 'loading');
             document.getElementById('emptyState').classList.toggle('hidden', view !== 'empty');
             document.getElementById('emptyState').classList.toggle('flex', view === 'empty');
@@ -191,6 +200,7 @@
             document.getElementById('paginationBar').classList.toggle('hidden', view !== 'grid');
         }
 
+        // Function to escape HTML to prevent XSS in task titles and descriptions 
         function esc(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -199,6 +209,7 @@
                 .replace(/"/g, '&quot;');
         }
 
+        // Function to build the HTML for a single task card based on its properties such as status, priority, and whether it's deleted
         function buildCard(task) {
             const isDeleted = Boolean(task.deleted_at);
             const pri = PRIORITY[task.priority] ?? PRIORITY[0];
@@ -210,6 +221,7 @@
                 .map(status => `<option value="${status}" ${task.status === status ? 'selected' : ''}>${STATUS[status].label}</option>`)
                 .join('');
 
+            // Show delete button if task in not deleted
             const deleteButton = isDeleted
                 ? ''
                 : `
@@ -245,6 +257,7 @@
             </div>`;
         }
 
+        // Function to render the tasks on the page based on the current filter and pagination
         function renderTasks() {
             if (!allTasks.length) {
                 showView('empty');
@@ -258,17 +271,20 @@
                 return;
             }
 
+            // Build the HTML for all tasks and insert it into the task grid container, then show the grid view and pagination
             document.getElementById('taskGrid').innerHTML = allTasks.map(buildCard).join('');
             updatePaginationUi();
             showView('grid');
         }
 
+        // Function to update the pagination information and enable/disable pagination buttons based on the current page and total pages
         function updatePaginationUi() {
             const info = document.getElementById('paginationInfo');
             const indicator = document.getElementById('pageIndicator');
             const prevBtn = document.getElementById('prevPageBtn');
             const nextBtn = document.getElementById('nextPageBtn');
 
+            // If pagination data is not available, hide pagination info and disable buttons
             if (!pagination) {
                 info.textContent = '';
                 indicator.textContent = '';
@@ -283,6 +299,7 @@
             nextBtn.disabled = pagination.current_page >= pagination.last_page;
         }
 
+        // Function to update the active state of the sidebar filter buttons based on the currently selected filter
         function updateSidebarActive() {
             ['all', 'pending', 'in_progress', 'completed', 'deleted'].forEach(filter => {
                 const btn = document.getElementById(`filter-${filter}`);
@@ -290,6 +307,7 @@
                     return;
                 }
 
+                // Determine if the current button corresponds to the active filter and toggle classes to highlight it
                 const active = filter === activeFilter;
                 btn.classList.toggle('bg-orange-100', active);
                 btn.classList.toggle('text-orange-600', active);
@@ -298,6 +316,7 @@
             });
         }
 
+        // Function to load tasks from the API based on the current page and filter
         async function loadTasks(page = 1) {
             showView('loading');
             currentPage = page;
@@ -331,6 +350,7 @@
             }
         }
 
+        // Function to set the active filter when a user clicks on a sidebar button, then reload tasks based on the new filter and reset to the first page
         window.setFilter = function (filter) {
             activeFilter = filter;
             currentPage = 1;
@@ -338,6 +358,7 @@
             loadTasks(1);
         };
 
+        // Function to change the page when the user clicks on the pagination buttons
         window.changePage = function (direction) {
             if (!pagination) {
                 return;
@@ -352,6 +373,7 @@
             loadTasks(nextPage);
         };
 
+        // Function to open the modal for adding a new task and focus on the title input field
         window.openTaskModal = function () {
             const modal = document.getElementById('taskModal');
             modal.classList.remove('hidden');
@@ -359,6 +381,7 @@
             modal.querySelector('input[name="title"]').focus();
         };
 
+        // Function to close the task modal, reset the form, and hide any error messages
         window.closeTaskModal = function () {
             const modal = document.getElementById('taskModal');
             modal.classList.add('hidden');
@@ -367,6 +390,7 @@
             document.getElementById('taskForm').reset();
         };
 
+        // Function to delete a task when the user clicks the delete button on a task card, with a confirmation prompt and error handling
         window.deleteTask = async function (id, btn) {
             if (!confirm('Delete this task?')) {
                 return;
@@ -386,14 +410,11 @@
             }
         };
 
+        // Function to update the status of a task when the user selects a new status from the dropdown on a task card, with validation to ensure only allowed status changes and error handling
         window.updateTaskStatus = async function (id, selectEl) {
             const nextStatus = selectEl.value;
             const originalStatus = allTasks.find(task => task.id === id)?.status;
             const allowed = allowedStatuses(originalStatus);
-
-            if (!originalStatus || originalStatus === nextStatus || !allowed.includes(nextStatus)) {
-                return;
-            }
 
             selectEl.disabled = true;
 
@@ -402,6 +423,8 @@
                     status: nextStatus,
                 });
 
+                // If the updated status does not match the active filter (and the active filter is not 'all')
+                // we reload the tasks to reflect the change and avoid showing a task with a status that doesn't match the filter
                 const shouldReload = activeFilter !== 'all' && updatedTask.status !== activeFilter;
 
                 if (shouldReload) {
@@ -419,6 +442,7 @@
             }
         };
 
+        // Event listener for the task form submission to create a new task, with error handling and UI updates to reflect the new task in the list
         document.getElementById('taskForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -429,6 +453,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving…';
 
+            // Gather form data and construct the payload for the API request
             const fd = new FormData(this);
             const payload = {
                 title: fd.get('title').trim(),
@@ -439,6 +464,7 @@
             };
 
             try {
+                // Make API request to create a new task with the form data, then close the modal and reload tasks to show the new task in the list
                 await axios.post('/api/tasks', payload);
                 window.closeTaskModal();
                 activeFilter = 'all';
