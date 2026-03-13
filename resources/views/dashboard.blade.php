@@ -209,13 +209,38 @@
                 .replace(/"/g, '&quot;');
         }
 
+        // Function to format due date strings into a more readable format
+        function formatDueDate(dateString) {
+            if (!dateString) {
+                return '';
+            }
+
+            const normalizedDate = String(dateString).includes('T')
+                ? String(dateString).slice(0, 10)
+                : String(dateString);
+
+            // Split the date string into components and create a Date object
+            const [year, month, day] = normalizedDate.split('-').map(Number);
+            if (!year || !month || !day) {
+                return esc(dateString);
+            }
+
+            const date = new Date(year, month - 1, day);
+
+            return new Intl.DateTimeFormat(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+            }).format(date);
+        }
+
         // Function to build the HTML for a single task card based on its properties such as status, priority, and whether it's deleted
         function buildCard(task) {
             const isDeleted = Boolean(task.deleted_at);
             const pri = PRIORITY[task.priority] ?? PRIORITY[0];
             const stat = STATUS[task.status] ?? STATUS.pending;
             const due = task.due_date
-                ? `<span class="text-xs text-gray-400 mt-2 block">Due: ${task.due_date}</span>`
+                ? `<span class="text-xs text-gray-400 mt-2 block">Due: ${formatDueDate(task.due_date)}</span>`
                 : '';
             const statusOptions = allowedStatuses(task.status)
                 .map(status => `<option value="${status}" ${task.status === status ? 'selected' : ''}>${STATUS[status].label}</option>`)
