@@ -12,33 +12,37 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-[#FDFDFC] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
+        <header class="w-full mb-6 not-has-[nav]:hidden">
             @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
+                <nav class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+                    <h2 class="text-xl font-bold text-orange-500">TaskFlow</h2>
+
+                    <div class="flex gap-4 items-center">
                     @auth
                         <a
                             href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] rounded-sm text-sm leading-normal"
+                            class="text-gray-600 hover:text-orange-500"
                         >
                             Dashboard
                         </a>
                     @else
                         <a
                             href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 text-[#1b1b18] border border-transparent hover:border-[#19140035] rounded-sm text-sm leading-normal"
+                            class="text-gray-600 hover:text-orange-500"
                         >
-                            Log in
+                            Login
                         </a>
 
                         @if (Route::has('register'))
                             <a
                                 href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] rounded-sm text-sm leading-normal"
+                                class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
                             >
-                                Register
+                                Sign Up
                             </a>
                         @endif
                     @endauth
+                    </div>
                 </nav>
             @endif
         </header>
@@ -56,14 +60,20 @@
                         track progress, and get things done faster.
                     </p>
 
-                    <div class="mt-8 flex gap-4">
-                        <a href="{{ route('register') }}" class="px-6 py-3 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition">
-                            Sign Up
-                        </a>
-                        <a href="{{ route('login') }}" class="px-6 py-3 border border-orange-500 text-orange-500 rounded-xl hover:bg-orange-50 transition">
-                            Log In
-                        </a>
-                    </div>
+                    @if (Route::has('register') || Route::has('login'))
+                        <div class="mt-8 flex gap-4">
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}" class="px-6 py-3 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition">
+                                    Sign Up
+                                </a>
+                            @endif
+                            @if (Route::has('login'))
+                                <a href="{{ route('login') }}" class="px-6 py-3 border border-orange-500 text-orange-500 rounded-xl hover:bg-orange-50 transition">
+                                    Log In
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex-1">
